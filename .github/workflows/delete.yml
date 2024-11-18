@@ -1,0 +1,32 @@
+name: Delete Workflow Runs
+
+on:
+  workflow_dispatch: # 수동으로 실행
+    inputs:
+      repository:
+        description: 'Repository name'
+        required: true
+        default: 'korehalal/user_app'
+      minimum_runs:
+        description: 'Minimum runs to keep for each workflow'
+        required: true
+        default: '6'
+      retain_days:
+        description: 'Retain days'
+        required: true
+        default: '7'
+
+jobs:
+  delete-workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Workflow Runs
+        uses: andstor/delete-workflow-runs@v3
+        with:
+          repository: ${{ github.event.inputs.repository }} # 현재 저장소
+          token: ${{ secrets.GH_PAT_DELETE_WORKFLOW }}        # Personal Access Token
+          retain_last: ${{ github.event.inputs.retain_days }} # 최근 5개는 유지
+          keep_minimum_runs: ${{ github.event.inputs.minimum_runs }}
+          # 아래에 추가 필터 옵션을 사용할 수 있음
+          # workflow_file_name: 'example.yml' # 특정 워크플로 파일의 실행만 삭제
+          # branch: 'main'                   # 특정 브랜치 실행만 삭제
